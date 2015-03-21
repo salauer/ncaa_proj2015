@@ -49,12 +49,15 @@ shinyServer(function(input, output) {
                 return(odds)
         })
         
-        output$best <- renderDataTable({
-#                 browser()
+        all_simulations <- reactive({
+                # browser()
                 odds <- odds()
                 all_sims <- c()
+                all_brackets <- c()
                 input$submit
-                
+                if(input$uk_lose){
+                        odds$odds_a[which(odds$team_a == "Kentucky")] <- 0
+                }
                 for(i in 1:isolate(input$sims)){
                         if(input$odd_type != "even")
                                 fte_odds <- fte_odds() else fte_odds <- odds()
@@ -69,19 +72,34 @@ shinyServer(function(input, output) {
                                 group_by(Bracket) %>%
                                 summarise(All_Points = sum(Points)) %>%
                                 arrange(desc(All_Points))
-                        one_bracket$Dollars <- c(.7*19*20, .2*19*20, 
-                                                 .1*19*20, rep(0, 16))
+                        one_bracket$Dollars <- c(250, 90, 40, rep(0, 16))
                         one_bracket$sim <- i
-                        all_sims <- bind_rows(all_sims, one_bracket)
+                        all_brackets <- bind_rows(all_brackets, one_bracket)
+                        all_sims <- bind_rows(all_sims, one_sim)
                 }
-                final_df <- all_sims %>%
+                final_brackets <- all_brackets %>%
                         group_by(Bracket) %>%
                         summarise(Mean_Points = mean(All_Points),
                                   Mean_Dollars = round(mean(Dollars),2),
-                                  Winning_Pct = 100*mean(Dollars==266),
+                                  Winning_Pct = 100*mean(Dollars==250),
                                   Money_Pct = 100*mean(Dollars > 0)) %>%
                         arrange(desc(Mean_Dollars))
-                return(final_df)
+                final_sims <- all_sims %>%
+                        filter(Round %in% c(4, 1)) %>%
+                        group_by(Winner) %>%
+                        summarise(Final4_Pct = 100*sum(Round == 4)/input$sims,
+                                  Champ_Pct = 100*sum(Round == 1)/input$sims) %>%
+                        arrange(desc(Champ_Pct))
+                return(list(final_sims = final_sims, final_brackets = final_brackets))
         })
+        
+        output$best <- renderDataTable({
+                # browser()
+                return(all_simulations()$final_brackets)
+        }, options=list(searching=0, orderClasses=TRUE, processing=0, paging=0, info=0))
+        
+        output$champ <- renderDataTable({
+                return(all_simulations()$final_sims)
+        }, options=list(searching=0, orderClasses=TRUE, processing=0, info=0))
         
 })
