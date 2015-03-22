@@ -1,16 +1,15 @@
-
-# This is the user-interface definition of a Shiny web application.
-# You can find out more about building applications with Shiny here:
-#
-# http://shiny.rstudio.com
-#
-
 library(shiny)
+remaining_winners <- schedule[grep("Team", schedule$Next),]
+loser_choices <- unique(c("None", as.vector(remaining_winners$team_a),
+                          as.vector(remaining_winners$team_b)))
+loser_choices <- loser_choices[-grep("Team", loser_choices)]
+if("Kentucky" %in% loser_choices)
+        loser_choices <- loser_choices[-which(loser_choices=="Kentucky")]
 
 shinyUI(fluidPage(
         
         # Application title
-        titlePanel("Real Life is for March Simulations (updated 3/21 5:35PM)"),
+        titlePanel("Real Life is for March Simulations (updated 3/21 7:30PM)"),
         
         # Sidebar with a slider input for number of bins
         sidebarLayout(
@@ -22,14 +21,18 @@ shinyUI(fluidPage(
                                     value = 100, step = 100),
                         
                         selectInput(inputId = "odd_type",
-                                    label = "Game Prediction Method:",
+                                    label = "Game prediction method:",
                                     choices = c("All teams equal chances" = "even",
                                                 "Fivethirtyeight Pre-64 Preds" = "fivethirtyeight",
                                                 "Fivethirtyeight R32 Preds" = "fte2"),
                                     selected = "even"),
                         
                         checkboxInput(inputId = "uk_lose",
-                                      label = "Make Kentucky Lose Next Game"),
+                                      label = "Make Kentucky lose next game"),
+                        
+                        selectInput(inputId = "loser",
+                                    label = "Or make another team lose:",
+                                    choices = loser_choices),
                         
                         actionButton("submit", "Submit"),
                         

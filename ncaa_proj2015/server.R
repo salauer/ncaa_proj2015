@@ -55,10 +55,17 @@ shinyServer(function(input, output) {
                 all_sims <- c()
                 all_brackets <- c()
                 input$submit
+                isolate({
                 if(input$uk_lose){
                         odds$odds_a[which(odds$team_a == "Kentucky")] <- 0
                 }
-                for(i in 1:isolate(input$sims)){
+                if(input$loser != "None"){
+                        if(input$loser %in% odds$team_a)
+                                odds$odds_a[which(odds$team_a == input$loser)] <- 0
+                        if(input$loser %in% odds$team_b)
+                                odds$odds_b[which(odds$team_b == input$loser)] <- 0
+                }
+                for(i in 1:input$sims){
                         if(input$odd_type != "even")
                                 fte_odds <- fte_odds() else fte_odds <- odds()
                         one_sim <- select(simulate_tourny(odds, "fte2", fte_odds), Game,
@@ -83,13 +90,15 @@ shinyServer(function(input, output) {
                                   Mean_Dollars = round(mean(Dollars),2),
                                   Winning_Pct = 100*mean(Dollars==250),
                                   Money_Pct = 100*mean(Dollars > 0)) %>%
-                        arrange(desc(Mean_Dollars))
+                        arrange(desc(Mean_Dollars), desc(Winning_Pct), desc(Money_Pct), 
+                                desc(Mean_Points))
                 final_sims <- all_sims %>%
                         filter(Round %in% c(4, 1)) %>%
                         group_by(Winner) %>%
                         summarise(Final4_Pct = 100*sum(Round == 4)/input$sims,
                                   Champ_Pct = 100*sum(Round == 1)/input$sims) %>%
-                        arrange(desc(Champ_Pct))
+                        arrange(desc(Champ_Pct), desc(Final4_Pct))
+                })
                 return(list(final_sims = final_sims, final_brackets = final_brackets))
         })
         
