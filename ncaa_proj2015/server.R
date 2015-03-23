@@ -4,11 +4,14 @@ library(shiny)
 shinyServer(function(input, output) {
         fte_odds <- reactive({
 #                 browser()
-                if(input$odd_type == "fivethirtyeight"){
+                if(input$odd_type == "fte"){
                         load_odds <- read.csv("adj_538.csv")
                 }
                 if(input$odd_type == "fte2"){
                         load_odds <- read.csv("R32-538.csv")
+                }
+                if(input$odd_type == "fte3"){
+                        load_odds <- read.csv("S16-538.csv")
                 }
                 
                  fte_odds <- load_odds %>%
