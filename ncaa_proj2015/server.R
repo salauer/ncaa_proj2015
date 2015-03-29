@@ -13,6 +13,9 @@ shinyServer(function(input, output) {
                 if(input$odd_type == "fte3"){
                         load_odds <- read.csv("S16-538.csv")
                 }
+                if(input$odd_type == "fte4"){
+                        load_odds <- read.csv("E8-538.csv")
+                }
                 
                  fte_odds <- load_odds %>%
                         gather("Round", "Odds", 2:7) %>%
