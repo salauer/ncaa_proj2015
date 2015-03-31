@@ -9,7 +9,7 @@ if("Kentucky" %in% loser_choices)
 shinyUI(fluidPage(
         
         # Application title
-        titlePanel("Real Life is for March Simulations (updated 3/29 5:00PM)"),
+        titlePanel("Real Life is for March Simulations (updated 3/29 7:40PM)"),
         
         # Sidebar with a slider input for number of bins
         sidebarLayout(
@@ -22,7 +22,8 @@ shinyUI(fluidPage(
                         
                         selectInput(inputId = "odd_type",
                                     label = "Game prediction method:",
-                                    choices = c("Fivethirtyeight E8 Projections" = "fte4",
+                                    choices = c("Fivethirtyeight F4 Projections" = "fte5",
+                                                "Fivethirtyeight E8 Projections" = "fte4",
                                                 "Fivethirtyeight S16 Projections" = "fte3",
                                                 "Fivethirtyeight R32 Projections" = "fte2",
                                                 "Fivethirtyeight Pre-64 Projections" = "fte",
